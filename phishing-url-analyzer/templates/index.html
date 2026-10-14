@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Cyber Threat & Phishing Analyzer{% endblock %}
+
+{% block content %}
+<div class="text-center mb-10">
+    <h1 class="text-4xl font-extrabold text-white mb-2">Smart Cyber Threat & Phishing Analyzer</h1>
+    <p class="text-slate-400">Advanced heuristic intelligence engine for real-time URL risk assessment and vulnerability inspection.</p>
+</div>
+
+<!-- Input Form Card -->
+<div class="bg-slate-900 p-6 rounded-2xl shadow-2xl border border-slate-800">
+    <form method="POST" id="scanForm" class="space-y-4" onsubmit="showLoader()">
+        <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Target Uniform Resource Locator (URL):</label>
+            <input type="url" name="url" required placeholder="https://secure-target-portal.com/login" 
+                class="w-full px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-blue-500 text-white placeholder-slate-600 transition">
+        </div>
+        <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition duration-200 shadow-lg shadow-blue-600/20 flex items-center justify-center space-x-2">
+            <span>Run Advanced Threat Analysis</span>
+        </button>
+    </form>
+    
+    <!-- Loading Spinner -->
+    <div id="loader" class="hidden text-center py-6">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+        <p class="text-slate-400 text-sm mt-2">Inspecting SSL certificates, WHOIS age, and security heuristics...</p>
+    </div>
+</div>
+
+<!-- Results Section -->
+{% if result %}
+<div class="mt-8 bg-slate-900 p-6 rounded-2xl shadow-2xl border border-slate-800 animate-fade-in">
+    <h2 class="text-xl font-bold mb-4 border-b border-slate-800 pb-3 text-blue-400 flex items-center justify-between">
+        <span>Threat Analysis Report</span>
+        <span class="text-xs text-slate-500 font-normal">Status: Verified</span>
+    </h2>
+    
+    <div class="mb-4">
+        <span class="text-xs uppercase tracking-wider text-slate-500 font-semibold block mb-1">Target Analyzed:</span> 
+        <span class="break-all text-blue-200 block bg-slate-950 p-3 rounded-xl font-mono text-sm border border-slate-800/60">{{ result.url }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/60">
+            <span class="text-slate-400 text-xs uppercase tracking-wider font-semibold block mb-1">Calculated Threat Score:</span>
+            <span class="text-3xl font-black text-white">{{ result.score }} <span class="text-sm font-normal text-slate-500">/ 100</span></span>
+        </div>
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/60 flex flex-col justify-center">
+            <span class="text-slate-400 text-xs uppercase tracking-wider font-semibold block mb-1">Risk Classification:</span>
+            <div>
+                <span class="inline-block px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider
+                    {% if result.status_class == 'danger' %} bg-red-500/10 text-red-400 border border-red-500/20 
+                    {% elif result.status_class == 'warning' %} bg-amber-500/10 text-amber-400 border border-amber-500/20 
+                    {% else %} bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 {% endif %}">
+                    {{ result.risk }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="text-sm uppercase tracking-wider font-semibold text-slate-400 mb-2">Detected Indicators & Flags:</h3>
+    <ul class="space-y-2 text-slate-300 bg-slate-950 p-4 rounded-xl border border-slate-800/60 text-sm">
+        {% for reason in result.reasons %}
+            <li class="flex items-start space-x-2">
+                <span class="text-blue-400 mt-0.5">•</span>
+                <span>{{ reason }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<!-- Scan History Section -->
+{% if history %}
+<div class="mt-10 bg-slate-900 p-6 rounded-2xl shadow-2xl border border-slate-800">
+    <h3 class="text-lg font-bold text-slate-200 mb-4">Recent Scan History</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-400">
+            <thead class="bg-slate-950 text-slate-300 uppercase text-xs">
+                <tr>
+                    <th class="p-3 rounded-l-lg">URL</th>
+                    <th class="p-3">Score</th>
+                    <th class="p-3">Risk Level</th>
+                    <th class="p-3 rounded-r-lg">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60">
+                {% for item in history %}
+                <tr class="hover:bg-slate-950/50 transition">
+                    <td class="p-3 font-mono text-xs text-slate-300 max-w-xs truncate">{{ item[0] }}</td>
+                    <td class="p-3 font-bold text-white">{{ item[1] }}/100</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase
+                            {% if item[1] >= 60 %} bg-red-500/10 text-red-400 
+                            {% elif item[1] >= 30 %} bg-amber-500/10 text-amber-400 
+                            {% else %} bg-emerald-500/10 text-emerald-400 {% endif %}">
+                            {{ item[2] }}
+                        </span>
+                    </td>
+                    <td class="p-3 text-xs text-slate-500">{{ item[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- JavaScript for Loading Spinner -->
+<script>
+    function showLoader() {
+        document.getElementById('scanForm').style.display = 'none';
+        document.getElementById('loader').style.display = 'block';
+    }
+</script>
+{% endblock %}

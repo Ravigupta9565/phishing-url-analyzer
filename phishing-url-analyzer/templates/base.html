@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Enterprise Cyber Threat Analyzer{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-blue-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-slate-900 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 max-w-5xl flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span class="text-xl">🛡️</span>
+                <span class="font-bold tracking-wider text-white text-lg">CyberGuard AI</span>
+            </div>
+            <span class="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full font-semibold uppercase">
+                Enterprise Edition v2.5
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Content Block -->
+    <main class="container mx-auto px-4 py-8 max-w-5xl flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-slate-600 text-xs border-t border-slate-900 mt-12">
+        Cyber Threat Intelligence Engine &copy; 2026 | Enterprise Grade Security Tool
+    </footer>
+
+</body>
+</html>
